@@ -33,7 +33,7 @@
     flashColor=[UIColor colorWithWhite:1 alpha:1];
     strokeColor=[UIColor colorWithWhite:.8 alpha:1];
 
-    introHeight=850;
+    introHeight=950;
 
     allowBallResize=false;
     dimAlpha=.04;
@@ -486,14 +486,17 @@
     introParagraph=[[UILabel alloc] initWithFrame:CGRectMake(m, m*3, w, 700)];
     introParagraph.center=CGPointMake(screenWidth*.5, introParagraph.center.y);
     introParagraph.font = [UIFont fontWithName:@"DIN Condensed" size:18];
-    introParagraph.numberOfLines=35;
+    introParagraph.numberOfLines=0;
     introParagraph.textColor=strokeColor;
     
-    NSString *stringTojustify                = @"Cristiano Ronaldo can famously volley a corner kick in total darkness. The magic behind this remarkable feat is hidden in Cristiano’s brain which enables him to use advance cues to plan upcoming actions. Darkball challenges your brain to do the same, distilling that scenario into its simplest form - intercept a ball in the dark. All you see is all you need.\n\nOne of the brain’s fundamental functions is to use information from the past and present to predict the future. This function is key to how animals, from dragonflies to humans, navigate a dynamic and uncertain world. To make predictions, the brain must have an “internal model” of the system it interacts with. A basic form of this function is at play when we move our body. For example, to reach for a cup, the brain must have a model to predict how the hand will respond to various motor commands. Internal models are also thought to play a crucial role when we mentally predict future states of the environment, for example when we track a ball as it moves behind another object. Here, we have designed a simple task to understand how the nervous system makes such predictions. In this task, subjects have to intercept a ball when it reaches its final position. By changing the speed of the ball, the intervals when it is invisible, and the target position, we will test various hypotheses about the algorithms that are used to integrate information about past and present to make predictions about the future.";
+    NSString *stringTojustify                = @"Cristiano Ronaldo can famously volley a corner kick in total darkness. The magic behind this remarkable feat is hidden in Cristiano’s brain which enables him to use advance cues to plan upcoming actions. Darkball challenges your brain to do the same, distilling that scenario into its simplest form - intercept a ball in the dark. All you see is all you need.\n\nOne of the brain’s fundamental functions is to use information from the past and present to predict the future. This function is key to how animals, from dragonflies to humans, navigate a dynamic and uncertain world. To make predictions, the brain must have an “internal model” of the system it interacts with. A basic form of this function is at play when we move our body. For example, to reach for a cup, the brain must have a model to predict how the hand will respond to various motor commands. Internal models are also thought to play a crucial role when we mentally predict future states of the environment, for example when we track a ball as it moves behind another object. Here, we have designed a simple task to understand how the nervous system makes such predictions. In this task, subjects have to intercept a ball when it reaches its final position. By changing the speed of the ball, the intervals when it is invisible, and the target position, we will test various hypotheses about the algorithms that are used to integrate information about past and present to make predictions about the future.\n\nDarkball was built in collaboration with the JazLab at the McGovern Institute for Brain Research at MIT.";
     NSDictionary *attributes                 = @{NSParagraphStyleAttributeName: paragraphStyles};
     NSAttributedString *attributedString     = [[NSAttributedString alloc] initWithString:stringTojustify attributes:attributes];
     
     introParagraph.attributedText             = attributedString;
+    CGSize introFit = [introParagraph sizeThatFits:CGSizeMake(w, CGFLOAT_MAX)];
+    introParagraph.frame = CGRectMake(m, m*3+45, w, introFit.height);
+    introParagraph.center=CGPointMake(screenWidth*.5, introParagraph.center.y);
     intro.alpha=1;
     [intro addSubview:introParagraph];
     
