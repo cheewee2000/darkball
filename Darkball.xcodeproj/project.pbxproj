@@ -48,8 +48,8 @@
 		444F09C21A1CEFB500E5E7C3 /* MachTimer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MachTimer.h; sourceTree = "<group>"; };
 		444F09C31A1CEFB500E5E7C3 /* MachTimer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MachTimer.m; sourceTree = "<group>"; };
 		444F09C41A1CEFB500E5E7C3 /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
-		444F09C81A1CEFB500E5E7C3 /* tatata.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = tatata.plist; sourceTree = "<group>"; };
-		444F09C91A1CEFB500E5E7C3 /* tatata.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = tatata.pch; sourceTree = "<group>"; };
+		444F09C81A1CEFB500E5E7C3 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		444F09C91A1CEFB500E5E7C3 /* Darkball.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Darkball.pch; sourceTree = "<group>"; };
 		444F09D61A1CEFB500E5E7C3 /* ViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
 		444F09D71A1CEFB500E5E7C3 /* ViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
 		4470939519EDC41E00F6D53C /* GameKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GameKit.framework; path = System/Library/Frameworks/GameKit.framework; sourceTree = SDKROOT; };
@@ -98,7 +98,7 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		444F09A61A1CEFB500E5E7C3 /* TATATA */ = {
+		444F09A61A1CEFB500E5E7C3 /* Darkball */ = {
 			isa = PBXGroup;
 			children = (
 				444F09C41A1CEFB500E5E7C3 /* main.m */,
@@ -111,15 +111,15 @@
 				AA0000071AAAAAA100000007 /* LaunchScreen.storyboard */,
 				AA0000091AAAAAA100000009 /* PrivacyInfo.xcprivacy */,
 			);
-			path = TATATA;
+			path = Darkball;
 			sourceTree = "<group>";
 		};
 		444F09F41A1CF0EE00E5E7C3 /* Misc */ = {
 			isa = PBXGroup;
 			children = (
 				44D879981A243493001021B0 /* Images.xcassets */,
-				444F09C81A1CEFB500E5E7C3 /* tatata.plist */,
-				444F09C91A1CEFB500E5E7C3 /* tatata.pch */,
+				444F09C81A1CEFB500E5E7C3 /* Info.plist */,
+				444F09C91A1CEFB500E5E7C3 /* Darkball.pch */,
 				444F09B81A1CEFB500E5E7C3 /* InfoPlist.strings */,
 				444F09BA1A1CEFB500E5E7C3 /* MainStoryboard.storyboard */,
 			);
@@ -150,7 +150,7 @@
 		70C2EB311475EF4F00751AE8 = {
 			isa = PBXGroup;
 			children = (
-				444F09A61A1CEFB500E5E7C3 /* TATATA */,
+				444F09A61A1CEFB500E5E7C3 /* Darkball */,
 				70C2EB3F1475EF4F00751AE8 /* Frameworks */,
 				70C2EB3D1475EF4F00751AE8 /* Products */,
 			);
@@ -198,7 +198,7 @@
 			dependencies = (
 			);
 			name = Darkball;
-			productName = VolumeSnap;
+			productName = Darkball;
 			productReference = 70C2EB3C1475EF4F00751AE8 /* Darkball.app */;
 			productType = "com.apple.product-type.application";
 		};
@@ -380,10 +380,11 @@
 					"$(inherited)",
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = TATATA/tatata.pch;
-				INFOPLIST_FILE = TATATA/tatata.plist;
+				GCC_PREFIX_HEADER = Darkball/Darkball.pch;
+				INFOPLIST_FILE = Darkball/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.cwandt.tatata;
 				PRODUCT_NAME = Darkball;
 				PROVISIONING_PROFILE = "";
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -403,10 +404,11 @@
 					"$(inherited)",
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = TATATA/tatata.pch;
-				INFOPLIST_FILE = TATATA/tatata.plist;
+				GCC_PREFIX_HEADER = Darkball/Darkball.pch;
+				INFOPLIST_FILE = Darkball/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				ONLY_ACTIVE_ARCH = NO;
+				PRODUCT_BUNDLE_IDENTIFIER = com.cwandt.tatata;
 				PRODUCT_NAME = Darkball;
 				PROVISIONING_PROFILE = "";
 				TARGETED_DEVICE_FAMILY = "1,2";

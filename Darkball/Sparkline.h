@@ -1,6 +1,6 @@
 //
 //  Sparkline.h
-//  tatata
+//  Darkball
 //
 //  Created by Che-Wei Wang on 12/14/14.
 //

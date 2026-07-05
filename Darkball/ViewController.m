@@ -503,7 +503,7 @@
 //    credits.font = [UIFont fontWithName:@"HelveticaNeue" size:9];
 //    credits.numberOfLines=3;
 //    credits.textAlignment=NSTextAlignmentCenter;
-//    credits.text=@"TATATA";
+//    credits.text=@"Darkball";
 //    //credits.textColor=[self getForegroundColor:0];
 //    [intro addSubview:credits];
 //    
