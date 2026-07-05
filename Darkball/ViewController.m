@@ -561,6 +561,9 @@
     //[self restart];
     
     displayLink = [CADisplayLink displayLinkWithTarget:self selector:@selector(update)];
+    // The game loop and trial timing assume 60 fps; pin the frame rate so
+    // ProMotion displays (120 Hz iPads/iPhones) don't double the game speed.
+    displayLink.preferredFrameRateRange = CAFrameRateRangeMake(60, 60, 60);
     [displayLink addToRunLoop:[NSRunLoop mainRunLoop] forMode:NSDefaultRunLoopMode];
     
 }
