@@ -51,6 +51,8 @@
 		70C2EB411475EF4F00751AE8 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 70C2EB401475EF4F00751AE8 /* UIKit.framework */; };
 		70C2EB431475EF4F00751AE8 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 70C2EB421475EF4F00751AE8 /* Foundation.framework */; };
 		70C2EB451475EF4F00751AE8 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 70C2EB441475EF4F00751AE8 /* CoreGraphics.framework */; };
+		AA0000011AAAAAA100000001 /* LocalUser.m in Sources */ = {isa = PBXBuildFile; fileRef = AA0000021AAAAAA100000002 /* LocalUser.m */; };
+		AA0000031AAAAAA100000003 /* TrialStore.m in Sources */ = {isa = PBXBuildFile; fileRef = AA0000041AAAAAA100000004 /* TrialStore.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -115,6 +117,10 @@
 		70C2EB5D1475F03B00751AE8 /* CoreAudio.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreAudio.framework; path = System/Library/Frameworks/CoreAudio.framework; sourceTree = SDKROOT; };
 		70C2EB5F1475F07400751AE8 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
 		70C2EB611475FE4900751AE8 /* MediaPlayer.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MediaPlayer.framework; path = System/Library/Frameworks/MediaPlayer.framework; sourceTree = SDKROOT; };
+		AA0000021AAAAAA100000002 /* LocalUser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LocalUser.m; sourceTree = "<group>"; };
+		AA0000051AAAAAA100000005 /* LocalUser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LocalUser.h; sourceTree = "<group>"; };
+		AA0000041AAAAAA100000004 /* TrialStore.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TrialStore.m; sourceTree = "<group>"; };
+		AA0000061AAAAAA100000006 /* TrialStore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TrialStore.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -174,6 +180,10 @@
 				4461DC0D1A682439009FDEA3 /* SurveyView.h */,
 				4461DC0E1A682439009FDEA3 /* SurveyView.m */,
 				4461DC151A6839E8009FDEA3 /* SurveyView.xib */,
+				AA0000051AAAAAA100000005 /* LocalUser.h */,
+				AA0000021AAAAAA100000002 /* LocalUser.m */,
+				AA0000061AAAAAA100000006 /* TrialStore.h */,
+				AA0000041AAAAAA100000004 /* TrialStore.m */,
 			);
 			path = TATATA;
 			sourceTree = "<group>";
@@ -377,6 +387,8 @@
 				444F09E91A1CEFB500E5E7C3 /* MachTimer.m in Sources */,
 				444F09F21A1CEFB500E5E7C3 /* ViewController.m in Sources */,
 				448F046D1A22C678009F215E /* Arc.m in Sources */,
+				AA0000011AAAAAA100000001 /* LocalUser.m in Sources */,
+				AA0000031AAAAAA100000003 /* TrialStore.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
