@@ -8,7 +8,7 @@
 //#define TESTING
 
 @interface ViewController () {
-    
+    BOOL hudSafeAreaInsetApplied;
 }
 @end
 
@@ -2005,6 +2005,22 @@
 }
 
 
+
+// Shift only top-anchored HUD elements (leaderboard + info buttons, intro page
+// labels) down by the top safe-area inset so they clear the Dynamic Island.
+// Ball path geometry untouched.
+- (void)viewSafeAreaInsetsDidChange
+{
+    [super viewSafeAreaInsetsDidChange];
+    CGFloat topInset = self.view.safeAreaInsets.top;
+    if (!hudSafeAreaInsetApplied && topInset > 0) {
+        hudSafeAreaInsetApplied = YES;
+        gameCenterButton.frame = CGRectOffset(gameCenterButton.frame, 0, topInset);
+        infoButton.frame = CGRectOffset(infoButton.frame, 0, topInset);
+        introTitle.frame = CGRectOffset(introTitle.frame, 0, topInset);
+        introParagraph.frame = CGRectOffset(introParagraph.frame, 0, topInset);
+    }
+}
 
 - (void)viewDidAppear:(BOOL)animated
 {

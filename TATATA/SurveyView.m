@@ -44,9 +44,14 @@
 
         
         [_agePicker selectRow:0 inComponent:0 animated:NO];
-        //change picker selectionline color
-        ((UIView *)[_agePicker.subviews objectAtIndex:1]).backgroundColor = [UIColor grayColor];
-        ((UIView *)[_agePicker.subviews objectAtIndex:2]).backgroundColor = [UIColor grayColor];
+        //change picker selectionline color (guarded: relies on private UIPickerView
+        //subview layout that no longer exists on modern iOS)
+        if (_agePicker.subviews.count > 1) {
+            ((UIView *)[_agePicker.subviews objectAtIndex:1]).backgroundColor = [UIColor grayColor];
+        }
+        if (_agePicker.subviews.count > 2) {
+            ((UIView *)[_agePicker.subviews objectAtIndex:2]).backgroundColor = [UIColor grayColor];
+        }
         
 
 //        [_frequentHeadaches addTarget:self action:@selector(checkboxSelected:) forControlEvents:UIControlEventTouchDown];
