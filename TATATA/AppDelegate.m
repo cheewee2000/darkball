@@ -1,12 +1,7 @@
 
 
 #import "AppDelegate.h"
-//#import "TestFlight.h"
-#import <Parse/Parse.h>
-//#import <ParseCrashReporting/ParseCrashReporting.h>
-#import <Crashlytics/Crashlytics.h>
 
-//#import "KMCGeigerCounter.h"
 @implementation AppDelegate
 
 //@synthesize window = _window;
@@ -14,60 +9,12 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
-    // Override point for customization after application launch.
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    [defaults setInteger:[defaults integerForKey:@"RunCount"] + 1 forKey:@"RunCount"];
 
-
-    
-    
-    //[ParseCrashReporting enable];
-    //[Parse enableLocalDatastore];
-    [Parse setApplicationId:@"bYOBEce4TlOAtXs7Y9BxrsEIVLYOqfMxsLLVjNAj"
-                  clientKey:@"ykory1V1jt9Q3gNG0tZX27nSCEsXRU92t2bkw6CP"];
-    [PFAnalytics trackAppOpenedWithLaunchOptions:launchOptions];
-
-    
-
-    
-    //[TestFlight takeOff:@"4191ad30-4dcc-4447-9ca6-9bd696285036"];
-    [PFUser enableAutomaticUser];
-    [[PFUser currentUser] incrementKey:@"RunCount"];
-    [[PFUser currentUser] saveInBackground];
-    
-    
-    
-    [Crashlytics startWithAPIKey:@"1eb6d15737d50f2df4316cb5b8b073da76a42b67"];
-
-    
-    // Register for Push Notitications
-    UIUserNotificationType userNotificationTypes = (UIUserNotificationTypeAlert |
-                                                    UIUserNotificationTypeBadge |
-                                                    UIUserNotificationTypeSound);
-    UIUserNotificationSettings *settings = [UIUserNotificationSettings settingsForTypes:userNotificationTypes
-                                                                             categories:nil];
-    [application registerUserNotificationSettings:settings];
-    [application registerForRemoteNotifications];
-    
-    
     [[UIApplication sharedApplication] setIdleTimerDisabled:YES];
-    [[UIApplication sharedApplication] setStatusBarHidden:YES];
-    
-    
-    //[self.window makeKeyAndVisible];
-    
-    //[KMCGeigerCounter sharedGeigerCounter].enabled = YES;
-    
+
     return YES;
-}
-
-- (void)application:(UIApplication *)application didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken {
-    // Store the deviceToken in the current installation and save it to Parse.
-    PFInstallation *currentInstallation = [PFInstallation currentInstallation];
-    [currentInstallation setDeviceTokenFromData:deviceToken];
-    [currentInstallation saveInBackground];
-}
-
-- (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo {
-    [PFPush handlePush:userInfo];
 }
 
 - (void)applicationWillResignActive:(UIApplication *)application
