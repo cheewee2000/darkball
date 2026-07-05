@@ -8,14 +8,11 @@
 
 #import <UIKit/UIKit.h>
 #import "Dots.h"
-#import "LocalUser.h"
-#import "TrialStore.h"
 #import <GameKit/GameKit.h>
 #import "MachTimer.h"
 #import "Arc.h"
 #import "Sparkline.h"
 #import "Crosshair.h"
-#import "SurveyView.h"
 //#import "Screener.h"
 
 #import "Dimension.h"
@@ -111,21 +108,13 @@
     BOOL allowBallResize;
     
     float trialDelay;
-    
-    SurveyView *surveyView;
+
     //Screener *screener;
-    int surveyHeight;
-    int screeningHeight;
-    int questionnaireHeight;
     int introHeight;
-    
-    NSArray *surveyHeights;
-    BOOL loggedIn;
-    
+
 #pragma mark - timing
     NSTimeInterval elapsed;
     NSTimeInterval timerGoal;
-    NSString *allTrialDataFile;
     MachTimer* aTimer;
     NSTimeInterval touchLength;
     NSTimeInterval touchStartTime;
@@ -172,8 +161,6 @@
 }
 @property int currentPage;
 
-@property LocalUser *currentUser;
-@property (strong, nonatomic) NSMutableArray *allTrialData;
 @property BOOL gameCenterEnabled;
 @property NSString *leaderboardIdentifier;
 

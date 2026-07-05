@@ -1,5 +1,4 @@
 #import "ViewController.h"
-#import <sys/utsname.h> // import it in your header or implementation file.
 
 #define IS_IPAD (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
 
@@ -34,12 +33,7 @@
     flashColor=[UIColor colorWithWhite:1 alpha:1];
     strokeColor=[UIColor colorWithWhite:.8 alpha:1];
 
-    surveyHeight=4000;
-    questionnaireHeight=1800;
-    screeningHeight=750;
     introHeight=850;
-
-    surveyHeights = @[@750,@1800,@4000];
 
     allowBallResize=false;
     dimAlpha=.04;
@@ -454,12 +448,6 @@
 //    
 //    
     
-    surveyView=[[SurveyView alloc] initWithFrame:CGRectMake(0, screenHeight*1.5, screenWidth, surveyHeight)];
-    surveyView.backgroundColor=[UIColor clearColor];
-    surveyView.alpha=0;
-    [scrollView addSubview:surveyView];
-    
-
 #pragma mark - intro
     intro=[[UIView alloc] initWithFrame:CGRectMake(0, screenHeight*1.5, screenWidth, introHeight)];
     intro.backgroundColor=bgColor;
@@ -806,43 +794,8 @@
 }
 
 -(void)setIntroPosition{
-
-    
-    if (![[NSUserDefaults standardUserDefaults] boolForKey:@"showIntro1"] && loggedIn) {//there is internet!
-        surveyView.alpha=1;
-        
-        
-        if([[NSUserDefaults standardUserDefaults]boolForKey:@"showScreening"]){
-            [scrollView setContentSize:CGSizeMake(scrollView.bounds.size.width, screeningHeight+screenHeight*1.5)];
-            //intro.frame=CGRectMake(0, surveyHeight+screenHeight*1.5, screenWidth, screenHeight);
-            intro.alpha=0;
-        }
-        else if([[NSUserDefaults standardUserDefaults]boolForKey:@"showQuestionnaire"]){
-            [scrollView setContentSize:CGSizeMake(scrollView.bounds.size.width, questionnaireHeight+screenHeight*1.5)];
-            //intro.frame=CGRectMake(0, surveyHeight+screenHeight*1.5, screenWidth, screenHeight);
-            intro.alpha=0;
-        }
-        else if([[NSUserDefaults standardUserDefaults]boolForKey:@"showConsent"]){
-            [scrollView setContentSize:CGSizeMake(scrollView.bounds.size.width, surveyHeight+screenHeight*1.5)];
-            //intro.frame=CGRectMake(0, surveyHeight+screenHeight*1.5, screenWidth, screenHeight);
-            intro.alpha=0;
-        }
-        
-        //completed entire survey
-        else{
-            [scrollView setContentSize:CGSizeMake(scrollView.bounds.size.width, screenHeight*1.5+surveyHeight)];
-            //intro.frame=CGRectMake(0, screenHeight*1.5, screenWidth, introHeight);
-            intro.alpha=1;
-        }
-    }
-    else{
-        surveyView.alpha=0;
-        [scrollView setContentSize:CGSizeMake(scrollView.bounds.size.width, screenHeight*1.5+introHeight)];
-        //intro.frame=CGRectMake(0, screenHeight*1.5, screenWidth, introHeight);
-        intro.alpha=1;
-        
-    }
-    
+    [scrollView setContentSize:CGSizeMake(scrollView.bounds.size.width, screenHeight*1.5+introHeight)];
+    intro.alpha=1;
 }
 
 
@@ -852,23 +805,18 @@
     
     if (y>=0 && y< screenHeight*.5-offset) _currentPage = 0;
     else  if (y>=screenHeight*.5-offset && y < screenHeight*1.5-offset) _currentPage = 1;
-    else  if (y>=screenHeight*1.5-offset && y < screenHeight*1.5+screeningHeight+200-offset) _currentPage = 2;
-    else  if (y>=screenHeight*1.5+screeningHeight-offset && y < screenHeight*1.5+questionnaireHeight+150-offset) _currentPage = 3;
-    else _currentPage=3+(y-screenHeight*1.5+questionnaireHeight+200-offset)/screenHeight;
+    else _currentPage = 2;
     return _currentPage;
-    
+
 }
 
 -(CGFloat) getPageHeight:(int) _page{
     CGFloat pageHeight;
     if(_page==0)pageHeight= 0;
     else if(_page==1)pageHeight= screenHeight*.5;
-    else if(_page==2)pageHeight= screenHeight*1.5;
-    else if(_page==3)pageHeight= screenHeight*1.5+screeningHeight+200;
-    else if(_page==4)pageHeight= screenHeight*1.5+questionnaireHeight+150;
-    else pageHeight=screenHeight*1.5+questionnaireHeight+150+screenHeight*(_page-4);
+    else pageHeight= screenHeight*1.5;
     return pageHeight;
-    
+
 }
 
 - (void)scrollViewWillEndDragging:(UIScrollView *)_scrollView withVelocity: (CGPoint)velocity targetContentOffset:(inout CGPoint *)targetContentOffset
@@ -907,10 +855,6 @@
 -(void) restart{
     trialSequence=-1;
     [self performSelector:@selector(showStartScreen) withObject:self afterDelay:0.8];
-    
-    if([[NSUserDefaults standardUserDefaults] boolForKey:@"showScreening"] && _currentUser[@"screened"]==nil ){
-        [self performSelector:@selector(showIntroView) withObject:self afterDelay:2.5];
-    }
 }
 
 -(void)showStartScreen{
@@ -995,12 +939,8 @@
 //        [scrollView setContentOffset:CGPointMake(0, 0) animated:YES];
 //        if([[NSUserDefaults standardUserDefaults] boolForKey:@"showIntro1"]){
 //            [[NSUserDefaults standardUserDefaults] setBool:NO forKey:@"showIntro1"];
-//            [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"showScreening"];
-//            [[NSUserDefaults standardUserDefaults] setBool:NO forKey:@"showQuestionnaire"];
-//            [[NSUserDefaults standardUserDefaults] setBool:NO forKey:@"showConsent"];
-//
 //            [[NSUserDefaults standardUserDefaults] synchronize];
-//            
+//
 //        }
 //        return;
 //    }
@@ -1030,11 +970,8 @@
     
     if([[NSUserDefaults standardUserDefaults] boolForKey:@"showIntro1"]){
         [[NSUserDefaults standardUserDefaults] setBool:NO forKey:@"showIntro1"];
-        [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"showScreening"];
-        [[NSUserDefaults standardUserDefaults] setBool:NO forKey:@"showQuestionnaire"];
-        [[NSUserDefaults standardUserDefaults] setBool:NO forKey:@"showConsent"];
         [[NSUserDefaults standardUserDefaults] synchronize];
-//        NSLog(@"hide screen and dimsiss intro");        
+//        NSLog(@"hide screen and dimsiss intro");
     }
 
     currentLevel=0;
@@ -1224,101 +1161,13 @@
 }
 
 -(void)saveTrialData{
-    
 
-    
-    NSDate* localDateTime = [NSDate dateWithTimeInterval:[[NSTimeZone systemTimeZone] secondsFromGMT] sinceDate:[NSDate date]];
-
-    
-    NSString *configVersion = [[NSUserDefaults standardUserDefaults] stringForKey:@"configVersion"];
-    NSString * build = [[NSBundle mainBundle] objectForInfoDictionaryKey: (NSString *)kCFBundleVersionKey];
-
-    
-    //save to disk
-    NSMutableDictionary *myDictionary = [[NSMutableDictionary alloc] init];
-    float diff=trueD2Duration-d2Duration;
-    [myDictionary setObject:[NSNumber numberWithFloat:diff] forKey:@"offset"];
-    [myDictionary setObject:[NSNumber numberWithFloat:timerGoal] forKey:@"goal"];
-    //[myDictionary setObject:[NSNumber numberWithFloat:trueTimerGoal] forKey:@"trueGoal"];
-
-    [myDictionary setObject:[NSNumber numberWithFloat:trialDelay] forKey:@"trialDelay"];
-    [myDictionary setObject:[NSNumber numberWithFloat:CATransactionDelay] forKey:@"CATransactionDelay"];
-    [myDictionary setObject:[NSNumber numberWithInt:droppedFrames] forKey:@"droppedFrames"];
-
-    [myDictionary setObject:[NSNumber numberWithFloat:flashT] forKey:@"flashT"];
-    [myDictionary setObject:[NSNumber numberWithInt:[currentTrial[@"index"]intValue]] forKey:@"trialIndex"];
-
-    [myDictionary setObject:[NSNumber numberWithFloat:[currentTrial[@"d1"]floatValue]] forKey:@"d1"];
-    [myDictionary setObject:[NSNumber numberWithFloat:[currentTrial[@"d2"]floatValue]] forKey:@"d2"];
-    [myDictionary setObject:[NSNumber numberWithFloat:[currentTrial[@"duration"]floatValue]] forKey:@"duration"];
-    [myDictionary setObject:[NSNumber numberWithFloat:levelAccuracy] forKey:@"errorWindow"];
-
-    
-    [myDictionary setObject:[NSNumber numberWithInt:d1Frames] forKey:@"d1Frames"];
-    [myDictionary setObject:[NSNumber numberWithInt:d2Frames] forKey:@"d2Frames"];
-
-    [myDictionary setObject:[NSNumber numberWithFloat:d1Duration] forKey:@"d1Duration"];
-    [myDictionary setObject:[NSNumber numberWithFloat:d2Duration] forKey:@"d2Duration"];
-    [myDictionary setObject:[NSNumber numberWithFloat:trueD1Duration] forKey:@"trueD1Duration"];
-    [myDictionary setObject:[NSNumber numberWithFloat:trueD2Duration-.06] forKey:@"trueD2Duration"];
-    [myDictionary setObject:[NSNumber numberWithInteger:currentLevel] forKey:@"level"];
-    [myDictionary setObject:[NSNumber numberWithBool:([self isAccurate])? YES:NO] forKey:@"win"];
-    [myDictionary setObject:localDateTime forKey:@"date"];
-    [myDictionary setObject:[NSTimeZone localTimeZone].abbreviation forKey:@"timezone"];
-    //[myDictionary setObject:[NSNumber numberWithBool: (touched)? YES:NO ] forKey:@"didTouch"];
-    //if(touched){
-    [myDictionary setObject:[NSNumber numberWithFloat: touchX ] forKey:@"touchX"];
-    [myDictionary setObject:[NSNumber numberWithFloat: touchY ] forKey:@"touchY"];
-    [myDictionary setObject:[NSNumber numberWithFloat: touchLength ] forKey:@"touchLength"];
-    [myDictionary setObject:[NSNumber numberWithFloat: trueD1Duration ] forKey:@"actualD1Duration"];
-    [myDictionary setObject:build forKey:@"build"];
-
-    
-
-    
-    
-    if(configVersion!=nil)[myDictionary setObject:configVersion forKey:@"configVersion"];
-
-    //}
-    [self.allTrialData addObject:myDictionary];
-    [self.allTrialData writeToFile:allTrialDataFile atomically:YES];
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
 
-    //save research record locally (was Parse "results")
-    if([_currentUser[@"iAgree"] boolValue]){
-        NSMutableDictionary *record = [myDictionary mutableCopy];
-
-        NSString*uuid;
-        if([defaults stringForKey:@"uuid"] == nil){
-            uuid=[[NSUUID UUID] UUIDString];
-            [defaults setObject:uuid forKey:@"uuid"];
-        }
-        else uuid =[defaults stringForKey:@"uuid"];
-        record[@"uuid"]=uuid;
-        record[@"errorWindow"]=[NSNumber numberWithFloat:levelAccuracy];
-        record[@"trialDelay"]=[NSNumber numberWithFloat:trialDelay];
-
-        [[TrialStore shared] appendTrial:record];
-    }
-
-    //[_currentUser incrementKey:@"trialsPlayed"];
     trialCount++;
     trialCountLabel.text=[NSString stringWithFormat:@"%li",trialCount];
     [defaults setObject:[NSNumber numberWithLong:trialCount] forKey:@"trialsPlayed"];
-    _currentUser[@"trialsPlayed"]=[NSNumber numberWithLong:trialCount];
 
-    
-    _currentUser[@"best"]=[NSNumber numberWithFloat:best];
-    
-//    float d2Duration=[currentTrial[@"duration"]floatValue]*[currentTrial[@"d2"]floatValue];
-//    accuracyScore=(d2Duration-fabs(diff))/(float)d2Duration;
-//    accuracyScore=([_currentUser[@"accuracyScore"] floatValue]+accuracyScore)/2.0;
-
-    
-//    _currentUser[@"accuracyScore"]=[NSNumber numberWithFloat:accuracyScore];
-//    accuracyLabel.text=[NSString stringWithFormat:@"%.3f%%",accuracyScore*100.0];
-//    [defaults setObject:[NSNumber numberWithFloat:[_currentUser[@"accuracyScore"] floatValue] ] forKey:@"accuracyScore"];
-    
     float accuracy;
     //if(elapsed<=timerGoal) accuracy=(float)elapsed/(float)timerGoal;
     //else accuracy=1.0-fabs(elapsed-timerGoal)/(float)timerGoal;
@@ -1337,13 +1186,6 @@
         [defaults synchronize];
     }
     accuracyLabel.text=[NSString stringWithFormat:@"%.2f%%",[defaults floatForKey:@"accuracyScore"]*100.0];
-
-
-    [_currentUser saveEventually];
-    
- 
-    
-    
 }
 
 
@@ -1351,33 +1193,9 @@
     [scrollView setContentOffset:CGPointMake(0, screenHeight*1.5) animated:YES];
 }
 
--(void)showQuestionnaire{
- [scrollView setContentOffset:CGPointMake(0, screenHeight*1.5+950) animated:YES];
-}
-
 #pragma mark DATA
 -(void)loadTrialData{
-    
-    NSArray *docPath = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
 
-    self.allTrialData = [[NSMutableArray alloc] init];
-    allTrialDataFile = [[docPath objectAtIndex:0] stringByAppendingPathComponent:@"allTrialData.dat"];
-    self.allTrialData = [[NSMutableArray alloc] initWithContentsOfFile: allTrialDataFile];
-    if(self.allTrialData == nil){
-        
-        self.allTrialData = [[NSMutableArray alloc] init];
-        //for (int i = 0; i <1 ; i++) {
-        NSMutableDictionary *myDictionary = [[NSMutableDictionary alloc] init];
-        [myDictionary setObject:[NSNumber numberWithFloat:0.0] forKey:@"accuracy"];
-        [myDictionary setObject:[NSNumber numberWithFloat:0.0] forKey:@"goal"];
-        [myDictionary setObject:[NSDate date] forKey:@"date"];
-        [myDictionary setObject:[NSNumber numberWithFloat:0.0] forKey:@"flashT"];
-
-        [self.allTrialData addObject:myDictionary];
-    
-        [self.allTrialData writeToFile:allTrialDataFile atomically:YES];
-    }
-    
     NSArray *libPath = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES);
     scoreHistory = [[NSMutableArray alloc] init];
     scoreHistoryDataFile = [[libPath objectAtIndex:0] stringByAppendingPathComponent:@"scoreHistory.dat"];
@@ -1804,8 +1622,7 @@
 
 -(void)setLevel:(int)level{
     //insequence
-    //currentTrial=[trialArray objectAtIndex: ([_currentUser[@"trialsPlayed"] integerValue]+level)%[trialArray count]];
-    
+
     //random
     currentTrial=[trialArray objectAtIndex: arc4random()%[trialArray count]];
 
@@ -1994,10 +1811,9 @@
 {
     
     NSLog(@"view will appear");
-    loggedIn=false;
-    
-    [self logIn];
-    
+
+    [self setIntroPosition];
+
     [self getTrialSequence];
 
 
@@ -2066,26 +1882,6 @@
      
 }
 
--(void)logIn{
-    _currentUser = [LocalUser currentUser];
-
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    NSString*uuid;
-    if([defaults stringForKey:@"uuid"] == nil){
-        uuid=[[NSUUID UUID] UUIDString];
-        [defaults setObject:uuid forKey:@"uuid"];
-    }
-    else uuid =[defaults stringForKey:@"uuid"];
-    _currentUser[@"uuid"]=uuid;
-    _currentUser[@"deviceName"]=[self deviceName];
-    _currentUser[@"best"]=[NSNumber numberWithFloat:best];
-
-    loggedIn=true;
-    [self setIntroPosition];
-}
-
-
-
 - (void)viewWillDisappear:(BOOL)animated
 {
 	[super viewWillDisappear:animated];
@@ -2115,15 +1911,5 @@
         }
     };
 }
-
--(NSString*) deviceName
-{
-    struct utsname systemInfo;
-    uname(&systemInfo);
-    
-    return [NSString stringWithCString:systemInfo.machine
-                              encoding:NSUTF8StringEncoding];
-}
-
 
 @end

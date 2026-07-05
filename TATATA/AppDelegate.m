@@ -9,9 +9,6 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    [defaults setInteger:[defaults integerForKey:@"RunCount"] + 1 forKey:@"RunCount"];
-
     [[UIApplication sharedApplication] setIdleTimerDisabled:YES];
 
     return YES;
