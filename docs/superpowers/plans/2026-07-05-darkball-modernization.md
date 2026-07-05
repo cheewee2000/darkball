@@ -754,3 +754,45 @@ git push origin master
 - `incrementKey:` exists on LocalUser (used nowhere after AppDelegate rewrite, kept for API completeness — acceptable).
 - `setIntroPosition` call added at end of new `logIn` (T4 Step 6) because the old async Parse callback set `loggedIn` late; synchronous login means the intro/survey layout must refresh once immediately.
 - Type consistency: `currentTrial` becomes NSDictionary; all uses are subscript reads (`currentTrial[@"d1"]` etc.) — compatible.
+
+---
+
+### Task 8: Remove consent form and data logging (scope change, user-directed)
+
+**User direction (2026-07-05):** "remove the consent form and data logging. we just want game play and game center leader board."
+
+**Files:**
+- Delete: `TATATA/SurveyView.h`, `TATATA/SurveyView.m`, `TATATA/SurveyView.xib`, `TATATA/LocalUser.h`, `TATATA/LocalUser.m`, `TATATA/TrialStore.h`, `TATATA/TrialStore.m`
+- Modify: `TATATA/ViewController.h`, `TATATA/ViewController.m`, `TATATA/AppDelegate.m`, `Darkball.xcodeproj/project.pbxproj`
+
+**Keep (gameplay state, NOT research logging):** best/lastScore/accuracyScore/trialsPlayed in NSUserDefaults, `accuracyHistory` + its file (drives the sparkline), `trialSequence.dat` + `loadLocalTrialSequence`, game config defaults (flashDuration etc.), the intro/instructions view (`intro`, `introHeight`, `showIntro1` flow), all Game Center code.
+
+- [ ] **Step 1: ViewController.h** — remove `#import "LocalUser.h"`, `#import "TrialStore.h"`, `#import "SurveyView.h"`; remove ivars `surveyView`, `surveyHeight`, `screeningHeight`, `questionnaireHeight`, `surveyHeights`, `loggedIn`, `allTrialDataFile`; remove properties `currentUser`, `allTrialData`. KEEP `introHeight` and `intro`.
+
+- [ ] **Step 2: ViewController.m — survey UI removal**
+  - ~37–42: delete `surveyHeight=`, `questionnaireHeight=`, `screeningHeight=`, `surveyHeights=` assignments (keep `introHeight=850;`).
+  - ~457–460: delete the SurveyView alloc/addSubview block.
+  - `setIntroPosition` (~807–843): replace the whole method body with the old "else" branch only:
+    ```objc
+    -(void)setIntroPosition{
+        [scrollView setContentSize:CGSizeMake(scrollView.bounds.size.width, screenHeight*1.5+introHeight)];
+        intro.alpha=1;
+    }
+    ```
+  - Scroll paging math (~855–869): the survey pages no longer exist. In the `_currentPage` computation, collapse the `screeningHeight`/`questionnaireHeight` branches so everything past `screenHeight*1.5` is the last page; in the `pageHeight` computation delete the `_page==3`/`_page==4` survey branches. No reference to `screeningHeight`/`questionnaireHeight` may survive.
+  - `restart` (~911–913): delete the `showScreening && _currentUser[@"screened"]==nil` block entirely (intro is handled by the `showIntro1` gate in viewDidAppear).
+  - ~993–1001 and ~1031–1035: in the intro-dismiss logic keep `showIntro1 → NO` but delete every line setting/reading `showScreening`, `showQuestionnaire`, `showConsent` (including commented ones).
+
+- [ ] **Step 3: ViewController.m — logging removal in `saveTrialData`**
+  - Delete the whole `myDictionary` build (from `NSMutableDictionary *myDictionary = [[NSMutableDictionary alloc] init];` through the `configVersion` conditional set), the `[self.allTrialData addObject:...]` / `writeToFile:` pair, and the entire `iAgree`/`record`/TrialStore block.
+  - Delete now-unused locals that only fed the record: `localDateTime`, `configVersion` (verify no other use).
+  - KEEP: `float diff=trueD2Duration-d2Duration;` if used by later scoring/labels — check; keep `trialCount++; trialCountLabel.text=...; [defaults setObject:... forKey:@"trialsPlayed"];`, the accuracy computation, `accuracyHistory` append/write, and `accuracyLabel` update.
+  - Delete `_currentUser[@"trialsPlayed"]=...`, `_currentUser[@"best"]=...`, `[_currentUser saveEventually];` and the commented `_currentUser`/`accuracyScore` lines.
+- [ ] **Step 4: ViewController.m — allTrialData init block (~1363–1378)**: delete the `self.allTrialData` load/create/write block and `allTrialDataFile` path setup. Keep the neighboring accuracyHistory/scoreHistory logic untouched.
+- [ ] **Step 5: ViewController.m — logIn removal**: delete the `logIn` method entirely, its call site, `loggedIn=false;` (~1997), and the now-unused `deviceName` method + `#import <sys/utsname.h>` if nothing else uses it. Delete stale comment at ~1807 referencing `_currentUser`.
+- [ ] **Step 6: AppDelegate.m**: remove the RunCount NSUserDefaults increment (keep setIdleTimerDisabled + return YES).
+- [ ] **Step 7: Repo + pbxproj**: `git rm` the seven deleted files; remove ALL their pbxproj entries (PBXBuildFile, PBXFileReference, group children, Sources phase for SurveyView.m/LocalUser.m/TrialStore.m, Resources phase for SurveyView.xib). The `AA00000*` IDs from Task 1 all go. `plutil -lint` must pass.
+- [ ] **Step 8: Verify**
+  - `grep -rn "SurveyView\|LocalUser\|TrialStore\|currentUser\|iAgree\|loggedIn\|allTrialData\|showScreening\|showQuestionnaire\|showConsent\|screeningHeight\|questionnaireHeight\|surveyHeight" TATATA/*.h TATATA/*.m Darkball.xcodeproj/project.pbxproj` → no output.
+  - Build: `xcodebuild -project Darkball.xcodeproj -scheme Darkball -configuration Debug -destination 'platform=iOS Simulator,name=iPhone 16 Pro,OS=26.2' build` → `** BUILD SUCCEEDED **`.
+- [ ] **Step 9: Commit** — `git add -A && git commit -m "Remove consent survey and research data logging; gameplay + Game Center only"` (+ session trailer).
