@@ -1430,17 +1430,16 @@
     [defaults synchronize];
     
     
-    if(_leaderboardIdentifier){
-        GKScore *score = [[GKScore alloc] initWithLeaderboardIdentifier:@"global.tatata"];
-        score.value = best;
-        
-        [GKScore reportScores:@[score] withCompletionHandler:^(NSError *error) {
+    if(_leaderboardIdentifier && _gameCenterEnabled){
+        [GKLeaderboard submitScore:best
+                           context:0
+                            player:[GKLocalPlayer localPlayer]
+                    leaderboardIDs:@[_leaderboardIdentifier]
+                 completionHandler:^(NSError *error) {
             if (error != nil) {
                 NSLog(@"%@", [error localizedDescription]);
             }
         }];
-
-  
     }
 }
 
@@ -1450,10 +1449,11 @@
     
 }
 -(void)showGlobalLeaderboard{
-    GKGameCenterViewController *gcViewController = [[GKGameCenterViewController alloc] init];
+    GKGameCenterViewController *gcViewController =
+        [[GKGameCenterViewController alloc] initWithLeaderboardID:@"global.tatata"
+                                                      playerScope:GKLeaderboardPlayerScopeGlobal
+                                                        timeScope:GKLeaderboardTimeScopeAllTime];
     gcViewController.gameCenterDelegate = self;
-    gcViewController.viewState = GKGameCenterViewControllerStateLeaderboards;
-    gcViewController.leaderboardIdentifier = @"global.tatata";
     [self presentViewController:gcViewController animated:YES completion:nil];
 }
 
@@ -2083,30 +2083,19 @@
 
 -(void)authenticateLocalPlayer{
     GKLocalPlayer *localPlayer = [GKLocalPlayer localPlayer];
-    
+
     localPlayer.authenticateHandler = ^(UIViewController *viewController, NSError *error){
         if (viewController != nil) {
             [self presentViewController:viewController animated:YES completion:nil];
         }
-        else{
-            if ([GKLocalPlayer localPlayer].authenticated) {
-                _gameCenterEnabled = YES;
-                
-                // Get the default leaderboard identifier.
-                [[GKLocalPlayer localPlayer] loadDefaultLeaderboardIdentifierWithCompletionHandler:^(NSString *leaderboardIdentifier, NSError *error) {
-                    
-                    if (error != nil) {
-                        NSLog(@"%@", [error localizedDescription]);
-                    }
-                    else{
-                        _leaderboardIdentifier = leaderboardIdentifier;
-                    }
-                }];
-            }
-            
-            else{
-                _gameCenterEnabled = NO;
-            }
+        else if (localPlayer.isAuthenticated) {
+            self.gameCenterEnabled = YES;
+            self.leaderboardIdentifier = @"global.tatata";
+        }
+        else {
+            self.gameCenterEnabled = NO;
+            self.leaderboardIdentifier = nil;
+            if (error) NSLog(@"Game Center auth: %@", error.localizedDescription);
         }
     };
 }
