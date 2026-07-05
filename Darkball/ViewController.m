@@ -480,7 +480,7 @@
     
     
     NSMutableParagraphStyle *paragraphStyles = [[NSMutableParagraphStyle alloc] init];
-    paragraphStyles.alignment                = NSTextAlignmentLeft;
+    paragraphStyles.alignment                = NSTextAlignmentJustified;
     paragraphStyles.firstLineHeadIndent      = 0.05;    // Very IMP
     
     introParagraph=[[UILabel alloc] initWithFrame:CGRectMake(m, m*3, w, 700)];
