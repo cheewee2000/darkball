@@ -796,3 +796,35 @@ git push origin master
   - `grep -rn "SurveyView\|LocalUser\|TrialStore\|currentUser\|iAgree\|loggedIn\|allTrialData\|showScreening\|showQuestionnaire\|showConsent\|screeningHeight\|questionnaireHeight\|surveyHeight" TATATA/*.h TATATA/*.m Darkball.xcodeproj/project.pbxproj` → no output.
   - Build: `xcodebuild -project Darkball.xcodeproj -scheme Darkball -configuration Debug -destination 'platform=iOS Simulator,name=iPhone 16 Pro,OS=26.2' build` → `** BUILD SUCCEEDED **`.
 - [ ] **Step 9: Commit** — `git add -A && git commit -m "Remove consent survey and research data logging; gameplay + Game Center only"` (+ session trailer).
+
+---
+
+### Task 9: Rename TATATA → Darkball throughout (scope change, user-directed)
+
+**User direction (2026-07-05):** rename all files and references to darkball. Decisions: bundle ID STAYS `com.cwandt.tatata` (preserves App Store record + `global.tatata` leaderboard — do NOT touch either); GitHub repo renamed to `darkball` (controller handles the remote/repo rename at push time, not this task).
+
+**Files:**
+- Rename: `TATATA/` directory → `Darkball/` (git mv, all contents)
+- Rename: `TATATA/tatata.plist` → `Darkball/Info.plist`; `TATATA/tatata.pch` → `Darkball/Darkball.pch`
+- Modify: `Darkball.xcodeproj/project.pbxproj`, `Darkball/Info.plist`, `README.md`
+- Delete: stale `TATATA` scheme file if present (find `*.xcscheme` named TATATA under Darkball.xcodeproj)
+
+- [ ] **Step 1: git mv the directory and the two files**
+```bash
+git mv TATATA Darkball
+git mv Darkball/tatata.plist Darkball/Info.plist
+git mv Darkball/tatata.pch Darkball/Darkball.pch
+```
+- [ ] **Step 2: pbxproj updates** — in `Darkball.xcodeproj/project.pbxproj`:
+  - The main app PBXGroup: `path = TATATA;` → `path = Darkball;` (and its `name` if present; the group comment `/* TATATA */` → `/* Darkball */` cosmetically).
+  - `INFOPLIST_FILE = TATATA/tatata.plist;` → `INFOPLIST_FILE = Darkball/Info.plist;` (2 occurrences).
+  - `GCC_PREFIX_HEADER = TATATA/tatata.pch;` → `GCC_PREFIX_HEADER = Darkball/Darkball.pch;` (2 occurrences).
+  - File references for `tatata.plist`/`tatata.pch` → new file names.
+  - `productName = VolumeSnap;` → `productName = Darkball;`
+  - Any remaining `TATATA` token in the pbxproj → eliminate (grep must end clean, EXCEPT nothing: bundle ID lives in Info.plist, not here).
+- [ ] **Step 3: Info.plist** — `CFBundleDisplayName`: `TATATA` → `Darkball`. `CFBundleIdentifier` REMAINS `com.cwandt.tatata` — verify unchanged. (`CFBundleName` uses $(PRODUCT_NAME) — fine.)
+- [ ] **Step 4: stale scheme** — find and `git rm` any `TATATA.xcscheme` under `Darkball.xcodeproj/` (check `xcshareddata/xcschemes/` and `xcuserdata/*/xcschemes/`); if it's untracked, just delete it. `xcodebuild -list` afterwards should show only scheme `Darkball` (an auto-generated one is fine).
+- [ ] **Step 5: README.md** — retitle to `Darkball` with note "(formerly TATATA)"; keep the temporal-dead-reckoning description.
+- [ ] **Step 6: source comment headers** — update `//  TATATA` file-header comments in `Darkball/*.h`/`*.m` to `//  Darkball` (cosmetic; e.g. `#import` lines don't reference the folder so code is unaffected). Grep check: `grep -rni "tatata" Darkball/ Darkball.xcodeproj/ README.md` → remaining hits must ONLY be the `com.cwandt.tatata` bundle ID and `global.tatata` leaderboard ID (in ViewController.m + Info.plist if applicable).
+- [ ] **Step 7: Verify** — `plutil -lint Darkball.xcodeproj/project.pbxproj && plutil -lint Darkball/Info.plist` OK; build: `xcodebuild -project Darkball.xcodeproj -scheme Darkball -configuration Debug -destination 'platform=iOS Simulator,name=iPhone 16 Pro,OS=26.2' build` → `** BUILD SUCCEEDED **`.
+- [ ] **Step 8: Commit** — `git add -A && git commit -m "Rename TATATA to Darkball throughout (keep com.cwandt.tatata bundle ID)"` (+ session trailer).
