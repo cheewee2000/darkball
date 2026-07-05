@@ -23,7 +23,7 @@
 //        float screenHeight=[[UIScreen mainScreen] bounds].size.height;
         float screenWidth=[[UIScreen mainScreen] bounds].size.width;
 
-        currentUser=[PFUser currentUser];
+        currentUser=[LocalUser currentUser];
 
         UIView *survey = [[[NSBundle mainBundle] loadNibNamed:@"SurveyView" owner:self options:nil] firstObject];
         survey.frame=CGRectMake(0, 0, survey.frame.size.width, survey.frame.size.height);
@@ -84,59 +84,39 @@
 
 
 -(void)loadSurveyResults{
-    
-    [[PFUser currentUser] fetchInBackgroundWithBlock:^(PFObject *object, NSError *error) {
-        if (!error){
-            [_agePicker selectRow:[currentUser[@"age"] integerValue] inComponent:0 animated:YES];
-            
-            int mfIndex;
-            if([currentUser[@"sex"] isEqual:@"Male"])mfIndex=0;
-            else if ([currentUser[@"sex"] isEqual:@"Female"]) mfIndex=1;
-            else mfIndex=-1;
-            if(mfIndex>=0) [_sex setSelectedSegmentIndex:mfIndex];
-            
-            int handedIndex;
-            if([currentUser[@"handed"] isEqual:@"Left"])handedIndex=0;
-            else if ([currentUser[@"handed"] isEqual:@"Right"]) handedIndex=1;
-            else handedIndex=-1;
-            if(handedIndex>=0) [_handed setSelectedSegmentIndex:handedIndex];
-            
-//            [_frequentHeadaches setSelected:[currentUser[@"frequentHeadaches"] boolValue]];
-//            [_dizziness setSelected:[currentUser[@"dizziness"] boolValue]];
-//            [_lossOfConsciousness setSelected:[currentUser[@"lossOfConsciousness"] boolValue]];
-//            [_seizures setSelected:[currentUser[@"seizures"] boolValue]];
-//            [_mentalHealth setSelected:[currentUser[@"mentalHealth"] boolValue]];
-//            
-//            [_narcotics setSelected:[currentUser[@"narcotics"] boolValue]];
-//            [_stimulants setSelected:[currentUser[@"stimulants"] boolValue]];
-//            [_cocain setSelected:[currentUser[@"cocain"] boolValue]];
-//            [_lsd setSelected:[currentUser[@"lsd"] boolValue]];
-//            [_marijuana setSelected:[currentUser[@"marijuana"] boolValue]];
-//            [_streetDrugs setSelected:[currentUser[@"streetDrugs"] boolValue]];
-            
-            [_professional setSelected:[currentUser[@"professional"] boolValue]];
-            [_collegiate setSelected:[currentUser[@"collegiate"] boolValue]];
-            [_amateur setSelected:[currentUser[@"amateur"] boolValue]];
-            [_intramural setSelected:[currentUser[@"intramural"] boolValue]];
-            [_casual setSelected:[currentUser[@"casual"] boolValue]];
-            [_none setSelected:[currentUser[@"none"] boolValue]];
-            
-            if(currentUser[@"iAgree"]!=nil){
-                [_iAgree setSelected:[currentUser[@"iAgree"] boolValue]];
-                [_iDoNotAgree setSelected:![currentUser[@"iAgree"] boolValue]];
-                _surveyParagraph.text=@"Thank you for submitting your answers. You may update your answers below at any time.";
-            }
-            
-            if(currentUser[@"screened"]!=nil){
-                [_yes setSelected:[currentUser[@"screened"] boolValue]];
-                [_no setSelected:![currentUser[@"screened"] boolValue]];
-            }
-        
-        }
-        
-        
-    }];
-    
+
+    [_agePicker selectRow:[currentUser[@"age"] integerValue] inComponent:0 animated:YES];
+
+    int mfIndex;
+    if([currentUser[@"sex"] isEqual:@"Male"])mfIndex=0;
+    else if ([currentUser[@"sex"] isEqual:@"Female"]) mfIndex=1;
+    else mfIndex=-1;
+    if(mfIndex>=0) [_sex setSelectedSegmentIndex:mfIndex];
+
+    int handedIndex;
+    if([currentUser[@"handed"] isEqual:@"Left"])handedIndex=0;
+    else if ([currentUser[@"handed"] isEqual:@"Right"]) handedIndex=1;
+    else handedIndex=-1;
+    if(handedIndex>=0) [_handed setSelectedSegmentIndex:handedIndex];
+
+    [_professional setSelected:[currentUser[@"professional"] boolValue]];
+    [_collegiate setSelected:[currentUser[@"collegiate"] boolValue]];
+    [_amateur setSelected:[currentUser[@"amateur"] boolValue]];
+    [_intramural setSelected:[currentUser[@"intramural"] boolValue]];
+    [_casual setSelected:[currentUser[@"casual"] boolValue]];
+    [_none setSelected:[currentUser[@"none"] boolValue]];
+
+    if(currentUser[@"iAgree"]!=nil){
+        [_iAgree setSelected:[currentUser[@"iAgree"] boolValue]];
+        [_iDoNotAgree setSelected:![currentUser[@"iAgree"] boolValue]];
+        _surveyParagraph.text=@"Thank you for submitting your answers. You may update your answers below at any time.";
+    }
+
+    if(currentUser[@"screened"]!=nil){
+        [_yes setSelected:[currentUser[@"screened"] boolValue]];
+        [_no setSelected:![currentUser[@"screened"] boolValue]];
+    }
+
 }
 
 #pragma mark - picker

@@ -8,7 +8,8 @@
 
 #import <UIKit/UIKit.h>
 #import "Dots.h"
-#import <Parse/Parse.h>
+#import "LocalUser.h"
+#import "TrialStore.h"
 #import <GameKit/GameKit.h>
 #import "MachTimer.h"
 #import "Arc.h"
@@ -16,7 +17,6 @@
 #import "Crosshair.h"
 #import "SurveyView.h"
 //#import "Screener.h"
-#import "Reachability.h"
 
 #import "Dimension.h"
 #import "UICountingLabel.h"
@@ -24,8 +24,7 @@
 @interface ViewController : UIViewController <GKGameCenterControllerDelegate,UIScrollViewDelegate>
 
 {
-    //PFUser *currentUser;
-    PFObject *currentTrial;
+    NSDictionary *currentTrial;
     long trialCount;
     
     int screenWidth,screenHeight;
@@ -121,7 +120,6 @@
     int introHeight;
     
     NSArray *surveyHeights;
-    NetworkStatus netStatus;
     BOOL loggedIn;
     
 #pragma mark - timing
@@ -174,7 +172,7 @@
 }
 @property int currentPage;
 
-@property PFUser *currentUser;
+@property LocalUser *currentUser;
 @property (strong, nonatomic) NSMutableArray *allTrialData;
 @property BOOL gameCenterEnabled;
 @property NSString *leaderboardIdentifier;

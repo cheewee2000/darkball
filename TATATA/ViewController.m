@@ -2,13 +2,6 @@
 #import <sys/utsname.h> // import it in your header or implementation file.
 
 #define IS_IPAD (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
-#define IS_IPHONE (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone)
-#define IS_IPHONE_4 (IS_IPHONE && [[UIScreen mainScreen] bounds].size.height == 480.0)
-#define IS_IPHONE_5 (IS_IPHONE && [[UIScreen mainScreen] bounds].size.height == 568.0)
-#define IS_IPHONE_6 (IS_IPHONE && [[UIScreen mainScreen] bounds].size.height == 667.0)
-#define IS_IPHONE_6_PLUS (IS_IPHONE && [[UIScreen mainScreen] bounds].size.height == 736.0)
-
-#define IS_OS_7_OR_LATER    ([[[UIDevice currentDevice] systemVersion] floatValue] >= 7.0)
 
 #define ARC4RANDOM_MAX 0x100000000
 
@@ -569,49 +562,10 @@
 //    if([defaults objectForKey:@"ballDiameter"] == nil) ballDiameter=80;
 //    else ballDiameter = (int)[defaults integerForKey:@"ballDiameter"];
     
-    //load configs. defaults in case no internet. too slow
-    NSLog(@"Getting the latest config...");
-    [PFConfig getConfigInBackgroundWithBlock:^(PFConfig *config, NSError *error) {
-        if (!error) {
-            NSLog(@"Yay! Config was fetched from the server.");
-        } else {
-            NSLog(@"Failed to fetch. Using Cached Config.");
-            config = [PFConfig currentConfig];
-        }
-        
-        if(config[@"flashDuration"]!=nil){
-            flashDuration=[config[@"flashDuration"]floatValue];
-            [defaults setObject:[NSNumber numberWithFloat:flashDuration] forKey:@"flashDuration"];
-            
-            accuracyStart=[config[@"accuracyStart"]floatValue];
-            [defaults setObject:[NSNumber numberWithFloat:accuracyStart] forKey:@"accuracyStart"];
-
-            accuracyMax=[config[@"accuracyMax"]floatValue];
-            [defaults setObject:[NSNumber numberWithFloat:accuracyMax] forKey:@"accuracyMax"];
-
-            accuracyIncrement=[config[@"accuracyIncrement"]floatValue];
-            [defaults setObject:[NSNumber numberWithFloat:accuracyIncrement] forKey:@"accuracyIncrement"];
-            
-            nTrialsInStage=[config[@"nTrialsInStage"]floatValue];
-            [defaults setObject:[NSNumber numberWithFloat:nTrialsInStage] forKey:@"nTrialsInStage"];
-        }
-//        ballDiameter=[config[@"ballDiameter"]floatValue];
-//        [defaults setObject:[NSNumber numberWithFloat:ballDiameter] forKey:@"ballDiameter"];
-
-        
-    }];
-    
     trialCount=[defaults integerForKey:@"trialsPlayed"];
     trialCountLabel.text=[NSString stringWithFormat:@"%li",trialCount];
     accuracyLabel.text=[NSString stringWithFormat:@"%.2f%%",[defaults floatForKey:@"accuracyScore"]*100.0];
-    
-//    [[PFUser currentUser] fetchInBackgroundWithBlock:^(PFObject *object, NSError *error) {
-//        if (!error){
-//            trialCountLabel.text=[NSString stringWithFormat:@"%i",[_currentUser[@"trialsPlayed"] intValue]];
-//            accuracyLabel.text=[NSString stringWithFormat:@"%.3f%%",[_currentUser[@"accuracyScore"]floatValue]*100.0];
-//        }
-//    }];
-    
+
     //currentLevel=11;
     //[self restart];
     
@@ -847,39 +801,14 @@
    bestLabel.center=CGPointMake(screenWidth*.5, startPos+(endPos)*(1.0-d));
     
     
-    if(scrollView.contentOffset.y<screenHeight*.5){
-        Reachability *reach = [Reachability reachabilityForInternetConnection];
-        
-        netStatus = [reach currentReachabilityStatus];
-        if (netStatus == NotReachable) {
-            NSLog(@"No internet connection!");
-        } else {
-            //NSLog(@"netstatus: %ld",netStatus);
-        }
-    }
-    
     [self setIntroPosition];
-    
-    //show catchzone in introview
-//    if(scrollView.contentOffset.y>screenHeight*.6){
-//        if(scrollView.contentSize.height>surveyHeight  && [[NSUserDefaults standardUserDefaults]boolForKey:@"showScreening"]){
-//            catchZone.center=CGPointMake(catchZone.center.x, scrollView.contentSize.height-scrollView.contentOffset.y-screenHeight+endY);
-//            catchZoneButton.center=CGPointMake(screenWidth*.5, scrollView.contentSize.height-screenHeight+endY);
-//            intro.alpha=1;
-//        }
-//        else if(netStatus==NotReachable){
-//            catchZone.center=CGPointMake(catchZone.center.x, -scrollView.contentOffset.y+screenHeight*1.5+endY);
-//            catchZoneButton.center=CGPointMake(screenWidth*.5, screenHeight*1.5+endY);
-//            //NSLog(@"show");
-//        }
-//    }
- 
+
 }
 
 -(void)setIntroPosition{
 
     
-    if (netStatus != NotReachable && ![[NSUserDefaults standardUserDefaults] boolForKey:@"showIntro1"] && loggedIn) {//there is internet!
+    if (![[NSUserDefaults standardUserDefaults] boolForKey:@"showIntro1"] && loggedIn) {//there is internet!
         surveyView.alpha=1;
         
         
@@ -979,9 +908,7 @@
     trialSequence=-1;
     [self performSelector:@selector(showStartScreen) withObject:self afterDelay:0.8];
     
-    Reachability *reach = [Reachability reachabilityForInternetConnection];
-    netStatus = [reach currentReachabilityStatus];
-    if((netStatus != NotReachable && [[NSUserDefaults standardUserDefaults] boolForKey:@"showScreening"]) && _currentUser[@"screened"]==nil ){
+    if([[NSUserDefaults standardUserDefaults] boolForKey:@"showScreening"] && _currentUser[@"screened"]==nil ){
         [self performSelector:@selector(showIntroView) withObject:self afterDelay:2.5];
     }
 }
@@ -1303,8 +1230,7 @@
     NSDate* localDateTime = [NSDate dateWithTimeInterval:[[NSTimeZone systemTimeZone] secondsFromGMT] sinceDate:[NSDate date]];
 
     
-    PFConfig * config = [PFConfig currentConfig];
-    NSString *configVersion=config[@"configVersion"];
+    NSString *configVersion = [[NSUserDefaults standardUserDefaults] stringForKey:@"configVersion"];
     NSString * build = [[NSBundle mainBundle] objectForInfoDictionaryKey: (NSString *)kCFBundleVersionKey];
 
     
@@ -1358,61 +1284,21 @@
     [self.allTrialData writeToFile:allTrialDataFile atomically:YES];
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
 
-    //save to parse
+    //save research record locally (was Parse "results")
     if([_currentUser[@"iAgree"] boolValue]){
-        PFObject *pObject = [PFObject objectWithClassName:@"results"];
-        pObject[@"offset"] = [NSNumber numberWithFloat:diff];
-        pObject[@"trueD1Duration"] = [NSNumber numberWithFloat:trueD1Duration];
+        NSMutableDictionary *record = [myDictionary mutableCopy];
 
-        //pObject[@"goal"] = [NSNumber numberWithFloat:timerGoal];
-        //pObject[@"trueGoal"] = [NSNumber numberWithFloat:trueTimerGoal];
-        pObject[@"d1Frames"] = [NSNumber numberWithInt:d1Frames];
-        pObject[@"d2Frames"] = [NSNumber numberWithInt:d2Frames];
-        pObject[@"d1Duration"] = [NSNumber numberWithFloat:d1Duration];
-        pObject[@"d2Duration"] = [NSNumber numberWithFloat:d2Duration];
-        pObject[@"trueD2Duration"] = [NSNumber numberWithFloat:trueD2Duration-.06];
-        pObject[@"CATransactionDelay"] = [NSNumber numberWithFloat:CATransactionDelay];
-        pObject[@"droppedFrames"] = [NSNumber numberWithInt:droppedFrames];
-
-        
-        pObject[@"flashT"]=[NSNumber numberWithFloat:flashT];
-        pObject[@"trialDelay"]=[NSNumber numberWithFloat:trialDelay];
-        //pObject[@"trials"]=currentTrial;
-        pObject[@"trialIndex"] = [NSNumber numberWithInt:[currentTrial[@"index"] intValue]];
-        pObject[@"d1"] = [NSNumber numberWithFloat:[currentTrial[@"d1"]floatValue]];
-        pObject[@"d2"] = [NSNumber numberWithFloat:[currentTrial[@"d2"]floatValue]];
-        pObject[@"duration"] = [NSNumber numberWithFloat:[currentTrial[@"duration"]floatValue]];
-        pObject[@"errorWindow"] = [NSNumber numberWithFloat:levelAccuracy];
-
-        
-        pObject[@"level"]=[NSNumber numberWithInteger:currentLevel];
-        pObject[@"win"]=([self isAccurate])? @YES:@NO;
-        pObject[@"date"]=localDateTime;
-        pObject[@"timezone"]=[NSString stringWithFormat:@"%@",[NSTimeZone localTimeZone].abbreviation];
-        //pObject[@"didTouch"]=(touched)? @YES:@NO;
-        //if(touched){
-        pObject[@"touchX"]=[NSNumber numberWithFloat: touchX ];
-        pObject[@"touchY"]=[NSNumber numberWithFloat: touchY ];
-        pObject[@"touchLength"]=[NSNumber numberWithFloat:touchLength];
-        pObject[@"configVersion"]=configVersion;
-        pObject[@"build"]=build;
-
-        //}
         NSString*uuid;
         if([defaults stringForKey:@"uuid"] == nil){
-            uuid=CFBridgingRelease(CFUUIDCreateString(NULL, CFUUIDCreate(NULL)));
+            uuid=[[NSUUID UUID] UUIDString];
             [defaults setObject:uuid forKey:@"uuid"];
-            [defaults synchronize];
         }
         else uuid =[defaults stringForKey:@"uuid"];
-        pObject[@"uuid"]=uuid;
-        
-        if(_currentUser!=nil) pObject[@"user"]=_currentUser;
-        
-        PFInstallation *currentInstallation = [PFInstallation currentInstallation];
-        if(currentInstallation!=nil)pObject[@"installation"]=currentInstallation;
-        
-        [pObject saveEventually];
+        record[@"uuid"]=uuid;
+        record[@"errorWindow"]=[NSNumber numberWithFloat:levelAccuracy];
+        record[@"trialDelay"]=[NSNumber numberWithFloat:trialDelay];
+
+        [[TrialStore shared] appendTrial:record];
     }
 
     //[_currentUser incrementKey:@"trialsPlayed"];
@@ -2129,21 +2015,7 @@
     [self setLevel:currentLevel];
     trialSequence=-1;
     [self performSelector:@selector(showStartScreen) withObject:self afterDelay:0.8];
-    
-    
-    Reachability *reach = [Reachability reachabilityForInternetConnection];
-    netStatus = [reach currentReachabilityStatus];
-    if (netStatus == NotReachable) {
-        NSLog(@"No internet connection!");
-    } else {
-        //NSLog(@"netstatus: %ld",netStatus);
-    }
-    
 
-    
-//    if((netStatus != NotReachable)){
-//    }
-   
     if([[NSUserDefaults standardUserDefaults] boolForKey:@"showIntro1"] ) [self performSelector:@selector(showIntroView) withObject:self afterDelay:2.5];
 
     [super viewDidAppear:animated];
@@ -2154,35 +2026,7 @@
     NSArray *libPath = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES);
     trialArrayDataFile=[[libPath objectAtIndex:0] stringByAppendingPathComponent:@"trialSequence.dat"];
 
-    //temporary load
     [self loadLocalTrialSequence];
-
-    
-    PFQuery *query = [PFQuery queryWithClassName:@"trials"];
-    [query addAscendingOrder:@"index"];
-    
-    [query findObjectsInBackgroundWithBlock:^(NSArray *results, NSError *error) {
-        if(!error){
-            NSLog(@"updated trial sequence");
-            trialArray = [NSMutableArray arrayWithArray: results];
-            
-            //save to disk
-            for( int i=0; i<trialArray.count; i++){
-                PFObject *t=[trialArray objectAtIndex:i];
-
-                NSDictionary *trial=[[NSDictionary alloc] initWithObjectsAndKeys:t[@"d1"],@"d1", t[@"d2"],@"d2", t[@"duration"],@"duration", t[@"index"],@"index",nil];
-                [trialArray replaceObjectAtIndex:i withObject:trial];
-                
-            }
-            [trialArray writeToFile:trialArrayDataFile atomically:YES];
-        }
-        else{
-            NSLog(@"load trial sequence fron disk");
-            [self loadLocalTrialSequence];
-        }
-    
-    }];
-    
 }
 
 -(void)loadLocalTrialSequence{
@@ -2207,73 +2051,21 @@
 }
 
 -(void)logIn{
-    
+    _currentUser = [LocalUser currentUser];
 
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    NSString*uuid;
+    if([defaults stringForKey:@"uuid"] == nil){
+        uuid=[[NSUUID UUID] UUIDString];
+        [defaults setObject:uuid forKey:@"uuid"];
+    }
+    else uuid =[defaults stringForKey:@"uuid"];
+    _currentUser[@"uuid"]=uuid;
+    _currentUser[@"deviceName"]=[self deviceName];
+    _currentUser[@"best"]=[NSNumber numberWithFloat:best];
 
-    
-//    _currentUser = [PFUser currentUser];
-//    if (_currentUser) {
-//        // do stuff with the user
-//        _currentUser[@"best"]=[NSNumber numberWithFloat:best];
-//        [_currentUser saveInBackground];
-//            NSLog(@"%@",_currentUser);
-//            NSLog(@"%@",_currentUser.objectId);
-//        
-//    } else {
-    
-        
-        [PFUser enableAutomaticUser];
-        [[PFUser currentUser] saveInBackgroundWithBlock:^(BOOL succeeded, NSError *error) {
-
-                if (error) {
-                    NSLog(@"Anonymous login failed.");
-                    loggedIn=false;
-                } else {
-                    NSLog(@"Anonymous user logged in.");
-                    _currentUser = [PFUser currentUser];
-                    
-                    
-                    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-                    NSString*uuid;
-                    if([defaults stringForKey:@"uuid"] == nil){
-                        uuid=CFBridgingRelease(CFUUIDCreateString(NULL, CFUUIDCreate(NULL)));
-                        [defaults setObject:uuid forKey:@"uuid"];
-                        [defaults synchronize];
-                    }
-                    else uuid =[defaults stringForKey:@"uuid"];
-                    _currentUser[@"uuid"]=uuid;
-                    _currentUser[@"deviceName"]=[self deviceName];
-                    _currentUser[@"best"]=[NSNumber numberWithFloat:best];
-
-                    PFInstallation *currentInstallation = [PFInstallation currentInstallation];
-                    _currentUser[@"installation"]=currentInstallation;
-                    //_currentUser[@"username"]=currentInstallation.deviceToken;
-                    NSLog(@"%@",_currentUser);
-                    
-                    [_currentUser saveInBackground];
-                    
-//                    [[PFInstallation currentInstallation] saveInBackgroundWithBlock:^(BOOL succeeded, NSError *error) {
-//                        if (error) {
-//                        } else {
-//                            currentInstallation[@"User"]=_currentUser;
-//                            [currentInstallation saveInBackground];
-//
-//                        }
-//                    }];
-                    loggedIn=true;
-                    
-                }
-            
-            
-        }];
-    
-    
-//        // show the signup or login screen
-//        [PFAnonymousUtils logInWithBlock:^(PFUser *user, NSError *error) {
-//                   }];
-   // }
-
-    
+    loggedIn=true;
+    [self setIntroPosition];
 }
 
 
@@ -2286,12 +2078,6 @@
 - (void)viewDidDisappear:(BOOL)animated
 {
 	[super viewDidDisappear:animated];
-}
-
-- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
-{
-    return NO;
-    
 }
 
 

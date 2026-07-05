@@ -8,7 +8,7 @@
 
 #import <UIKit/UIKit.h>
 #import "Dots.h"
-#import <Parse/Parse.h>
+#import "LocalUser.h"
 
 
 @interface SurveyView : UIView <UIPickerViewDelegate, UIPickerViewDataSource>
@@ -22,7 +22,7 @@
     //IBOutlet UIPickerView *agePicker;
     Dots *catchZone;
     UIButton *catchZoneButton;
-    PFUser *currentUser;
+    LocalUser *currentUser;
     
 
 }
