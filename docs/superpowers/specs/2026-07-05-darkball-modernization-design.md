@@ -1,7 +1,16 @@
 # Darkball (TATATA) Modernization — Design
 
 **Date:** 2026-07-05
-**Status:** Approved
+**Status:** Approved (amended)
+
+> **Amendment (2026-07-05, user direction):** The research features are
+> REMOVED, not preserved. No consent form / survey (SurveyView), no trial
+> data logging (TrialStore / LocalUser / allTrialData records). The app is
+> gameplay + Game Center leaderboard only. Sections 2's "replace Parse with
+> local storage" is superseded: Parse-derived user/trial-record code is
+> deleted outright. Local gameplay state (best score, accuracy history,
+> trial sequence, NSUserDefaults game config) stays — it drives the in-game
+> HUD and sparkline. The intro/instructions view stays.
 
 ## Goal
 

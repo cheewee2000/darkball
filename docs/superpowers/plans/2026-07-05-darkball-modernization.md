@@ -754,3 +754,77 @@ git push origin master
 - `incrementKey:` exists on LocalUser (used nowhere after AppDelegate rewrite, kept for API completeness — acceptable).
 - `setIntroPosition` call added at end of new `logIn` (T4 Step 6) because the old async Parse callback set `loggedIn` late; synchronous login means the intro/survey layout must refresh once immediately.
 - Type consistency: `currentTrial` becomes NSDictionary; all uses are subscript reads (`currentTrial[@"d1"]` etc.) — compatible.
+
+---
+
+### Task 8: Remove consent form and data logging (scope change, user-directed)
+
+**User direction (2026-07-05):** "remove the consent form and data logging. we just want game play and game center leader board."
+
+**Files:**
+- Delete: `TATATA/SurveyView.h`, `TATATA/SurveyView.m`, `TATATA/SurveyView.xib`, `TATATA/LocalUser.h`, `TATATA/LocalUser.m`, `TATATA/TrialStore.h`, `TATATA/TrialStore.m`
+- Modify: `TATATA/ViewController.h`, `TATATA/ViewController.m`, `TATATA/AppDelegate.m`, `Darkball.xcodeproj/project.pbxproj`
+
+**Keep (gameplay state, NOT research logging):** best/lastScore/accuracyScore/trialsPlayed in NSUserDefaults, `accuracyHistory` + its file (drives the sparkline), `trialSequence.dat` + `loadLocalTrialSequence`, game config defaults (flashDuration etc.), the intro/instructions view (`intro`, `introHeight`, `showIntro1` flow), all Game Center code.
+
+- [ ] **Step 1: ViewController.h** — remove `#import "LocalUser.h"`, `#import "TrialStore.h"`, `#import "SurveyView.h"`; remove ivars `surveyView`, `surveyHeight`, `screeningHeight`, `questionnaireHeight`, `surveyHeights`, `loggedIn`, `allTrialDataFile`; remove properties `currentUser`, `allTrialData`. KEEP `introHeight` and `intro`.
+
+- [ ] **Step 2: ViewController.m — survey UI removal**
+  - ~37–42: delete `surveyHeight=`, `questionnaireHeight=`, `screeningHeight=`, `surveyHeights=` assignments (keep `introHeight=850;`).
+  - ~457–460: delete the SurveyView alloc/addSubview block.
+  - `setIntroPosition` (~807–843): replace the whole method body with the old "else" branch only:
+    ```objc
+    -(void)setIntroPosition{
+        [scrollView setContentSize:CGSizeMake(scrollView.bounds.size.width, screenHeight*1.5+introHeight)];
+        intro.alpha=1;
+    }
+    ```
+  - Scroll paging math (~855–869): the survey pages no longer exist. In the `_currentPage` computation, collapse the `screeningHeight`/`questionnaireHeight` branches so everything past `screenHeight*1.5` is the last page; in the `pageHeight` computation delete the `_page==3`/`_page==4` survey branches. No reference to `screeningHeight`/`questionnaireHeight` may survive.
+  - `restart` (~911–913): delete the `showScreening && _currentUser[@"screened"]==nil` block entirely (intro is handled by the `showIntro1` gate in viewDidAppear).
+  - ~993–1001 and ~1031–1035: in the intro-dismiss logic keep `showIntro1 → NO` but delete every line setting/reading `showScreening`, `showQuestionnaire`, `showConsent` (including commented ones).
+
+- [ ] **Step 3: ViewController.m — logging removal in `saveTrialData`**
+  - Delete the whole `myDictionary` build (from `NSMutableDictionary *myDictionary = [[NSMutableDictionary alloc] init];` through the `configVersion` conditional set), the `[self.allTrialData addObject:...]` / `writeToFile:` pair, and the entire `iAgree`/`record`/TrialStore block.
+  - Delete now-unused locals that only fed the record: `localDateTime`, `configVersion` (verify no other use).
+  - KEEP: `float diff=trueD2Duration-d2Duration;` if used by later scoring/labels — check; keep `trialCount++; trialCountLabel.text=...; [defaults setObject:... forKey:@"trialsPlayed"];`, the accuracy computation, `accuracyHistory` append/write, and `accuracyLabel` update.
+  - Delete `_currentUser[@"trialsPlayed"]=...`, `_currentUser[@"best"]=...`, `[_currentUser saveEventually];` and the commented `_currentUser`/`accuracyScore` lines.
+- [ ] **Step 4: ViewController.m — allTrialData init block (~1363–1378)**: delete the `self.allTrialData` load/create/write block and `allTrialDataFile` path setup. Keep the neighboring accuracyHistory/scoreHistory logic untouched.
+- [ ] **Step 5: ViewController.m — logIn removal**: delete the `logIn` method entirely, its call site, `loggedIn=false;` (~1997), and the now-unused `deviceName` method + `#import <sys/utsname.h>` if nothing else uses it. Delete stale comment at ~1807 referencing `_currentUser`.
+- [ ] **Step 6: AppDelegate.m**: remove the RunCount NSUserDefaults increment (keep setIdleTimerDisabled + return YES).
+- [ ] **Step 7: Repo + pbxproj**: `git rm` the seven deleted files; remove ALL their pbxproj entries (PBXBuildFile, PBXFileReference, group children, Sources phase for SurveyView.m/LocalUser.m/TrialStore.m, Resources phase for SurveyView.xib). The `AA00000*` IDs from Task 1 all go. `plutil -lint` must pass.
+- [ ] **Step 8: Verify**
+  - `grep -rn "SurveyView\|LocalUser\|TrialStore\|currentUser\|iAgree\|loggedIn\|allTrialData\|showScreening\|showQuestionnaire\|showConsent\|screeningHeight\|questionnaireHeight\|surveyHeight" TATATA/*.h TATATA/*.m Darkball.xcodeproj/project.pbxproj` → no output.
+  - Build: `xcodebuild -project Darkball.xcodeproj -scheme Darkball -configuration Debug -destination 'platform=iOS Simulator,name=iPhone 16 Pro,OS=26.2' build` → `** BUILD SUCCEEDED **`.
+- [ ] **Step 9: Commit** — `git add -A && git commit -m "Remove consent survey and research data logging; gameplay + Game Center only"` (+ session trailer).
+
+---
+
+### Task 9: Rename TATATA → Darkball throughout (scope change, user-directed)
+
+**User direction (2026-07-05):** rename all files and references to darkball. Decisions: bundle ID STAYS `com.cwandt.tatata` (preserves App Store record + `global.tatata` leaderboard — do NOT touch either); GitHub repo renamed to `darkball` (controller handles the remote/repo rename at push time, not this task).
+
+**Files:**
+- Rename: `TATATA/` directory → `Darkball/` (git mv, all contents)
+- Rename: `TATATA/tatata.plist` → `Darkball/Info.plist`; `TATATA/tatata.pch` → `Darkball/Darkball.pch`
+- Modify: `Darkball.xcodeproj/project.pbxproj`, `Darkball/Info.plist`, `README.md`
+- Delete: stale `TATATA` scheme file if present (find `*.xcscheme` named TATATA under Darkball.xcodeproj)
+
+- [ ] **Step 1: git mv the directory and the two files**
+```bash
+git mv TATATA Darkball
+git mv Darkball/tatata.plist Darkball/Info.plist
+git mv Darkball/tatata.pch Darkball/Darkball.pch
+```
+- [ ] **Step 2: pbxproj updates** — in `Darkball.xcodeproj/project.pbxproj`:
+  - The main app PBXGroup: `path = TATATA;` → `path = Darkball;` (and its `name` if present; the group comment `/* TATATA */` → `/* Darkball */` cosmetically).
+  - `INFOPLIST_FILE = TATATA/tatata.plist;` → `INFOPLIST_FILE = Darkball/Info.plist;` (2 occurrences).
+  - `GCC_PREFIX_HEADER = TATATA/tatata.pch;` → `GCC_PREFIX_HEADER = Darkball/Darkball.pch;` (2 occurrences).
+  - File references for `tatata.plist`/`tatata.pch` → new file names.
+  - `productName = VolumeSnap;` → `productName = Darkball;`
+  - Any remaining `TATATA` token in the pbxproj → eliminate (grep must end clean, EXCEPT nothing: bundle ID lives in Info.plist, not here).
+- [ ] **Step 3: Info.plist** — `CFBundleDisplayName`: `TATATA` → `Darkball`. `CFBundleIdentifier` REMAINS `com.cwandt.tatata` — verify unchanged. (`CFBundleName` uses $(PRODUCT_NAME) — fine.)
+- [ ] **Step 4: stale scheme** — find and `git rm` any `TATATA.xcscheme` under `Darkball.xcodeproj/` (check `xcshareddata/xcschemes/` and `xcuserdata/*/xcschemes/`); if it's untracked, just delete it. `xcodebuild -list` afterwards should show only scheme `Darkball` (an auto-generated one is fine).
+- [ ] **Step 5: README.md** — retitle to `Darkball` with note "(formerly TATATA)"; keep the temporal-dead-reckoning description.
+- [ ] **Step 6: source comment headers** — update `//  TATATA` file-header comments in `Darkball/*.h`/`*.m` to `//  Darkball` (cosmetic; e.g. `#import` lines don't reference the folder so code is unaffected). Grep check: `grep -rni "tatata" Darkball/ Darkball.xcodeproj/ README.md` → remaining hits must ONLY be the `com.cwandt.tatata` bundle ID and `global.tatata` leaderboard ID (in ViewController.m + Info.plist if applicable).
+- [ ] **Step 7: Verify** — `plutil -lint Darkball.xcodeproj/project.pbxproj && plutil -lint Darkball/Info.plist` OK; build: `xcodebuild -project Darkball.xcodeproj -scheme Darkball -configuration Debug -destination 'platform=iOS Simulator,name=iPhone 16 Pro,OS=26.2' build` → `** BUILD SUCCEEDED **`.
+- [ ] **Step 8: Commit** — `git add -A && git commit -m "Rename TATATA to Darkball throughout (keep com.cwandt.tatata bundle ID)"` (+ session trailer).
