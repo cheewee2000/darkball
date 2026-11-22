@@ -54,3 +54,12 @@
 }
 
 @end
+
+// Apps built with the iOS 27 SDK must use the UIScene lifecycle or UIKit traps at launch.
+// The storyboard is loaded through UIApplicationSceneManifest in Info.plist; this class only owns the window.
+@interface SceneDelegate : UIResponder <UIWindowSceneDelegate>
+@property (strong, nonatomic) UIWindow *window;
+@end
+
+@implementation SceneDelegate
+@end
