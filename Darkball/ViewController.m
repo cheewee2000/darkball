@@ -11,6 +11,9 @@
 }
 @end
 
+// Size handed to the replacement controller built in viewDidLayoutSubviews.
+static CGSize relayoutSize;
+
 @implementation ViewController
 
 
@@ -25,7 +28,9 @@
 - (void)viewDidLoad
 {
    [super viewDidLoad];
-    
+
+    if (relayoutSize.width > 0) self.view.frame = (CGRect){CGPointZero, relayoutSize};
+
     screenHeight=self.view.frame.size.height;
     screenWidth=self.view.frame.size.width;
     bgColor=[UIColor colorWithRed:14/255.0 green:14/255.0 blue:15/255.0 alpha:1];
@@ -1842,6 +1847,24 @@
         introTitle.frame = CGRectOffset(introTitle.frame, 0, topInset);
         introParagraph.frame = CGRectOffset(introParagraph.frame, 0, topInset);
     }
+}
+
+// iPhone Duo fold/unfold (or any other live window resize). Every frame in this
+// class is computed once in viewDidLoad from the view size, so start over with a
+// fresh controller at the new size. This ends a run in progress and returns to
+// the start screen; best score and stats are already saved after every trial.
+- (void)viewDidLayoutSubviews
+{
+    [super viewDidLayoutSubviews];
+    CGSize size = self.view.bounds.size;
+    if ((int)size.width == screenWidth && (int)size.height == screenHeight) return;
+    UIWindow *window = self.view.window;
+    // While Game Center is presented, wait: layout runs again when it is dismissed.
+    if (window.rootViewController != self || self.presentedViewController) return;
+    [displayLink invalidate]; // the display link retains self
+    [NSObject cancelPreviousPerformRequestsWithTarget:self];
+    relayoutSize = size;
+    window.rootViewController = [self.storyboard instantiateInitialViewController];
 }
 
 - (void)viewDidAppear:(BOOL)animated
